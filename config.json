@@ -1,0 +1,15 @@
+{
+  "webhook_path": "/webhook/xxxxxxxxx",
+  "port": 56578,
+  "rest_accounts": [
+  {
+    "account_id": "331169",
+    "access_token": "",
+    "refresh_token": ""
+  }
+],
+  "vertex": {
+    "base_url": "",
+    "cookie": ""
+  }
+}
