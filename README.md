@@ -6,3 +6,12 @@
 - `dashboard.html` （界面模板）
 
 ---
+
+
+## 开始 
+
+先获取各token   **access_token** **refresh_token**  
+
+先在本地或者任意服务器运行脚本  ```获取token.py```  
+
+

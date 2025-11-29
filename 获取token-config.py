@@ -28,7 +28,6 @@ def request_device_code(client_id):
 def poll_token(client_id, device_code, interval):
     """轮询 token endpoint，直到授权成功"""
     print(f"[{client_id}] 开始轮询，每 {interval}s 查询一次…")
-
     while True:
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
@@ -60,7 +59,7 @@ def poll_token(client_id, device_code, interval):
 
 
 def main():
-    token_store = {}
+    rest_accounts = []
 
     for acc in ACCOUNTS:
         name = acc["name"]
@@ -83,13 +82,30 @@ def main():
         token_data = poll_token(client_id, device_code, interval)
 
         if token_data:
-            token_store[name] = token_data
+            account_entry = {
+                "account_id": name,
+                "access_token": token_data.get("access_token", ""),
+                "refresh_token": token_data.get("refresh_token", "")
+            }
+            rest_accounts.append(account_entry)
 
-    # 保存所有账号 token
-    with open("tokens.json", "w") as f:
-        json.dump(token_store, f, indent=2)
+    # 构建最终的配置文件格式
+    config = {
+        "webhook_path": "/webhook/你的密钥",
+        "port": 56578,
+        "rest_accounts": rest_accounts,
+        "vertex": {
+            "base_url": "你的链接",
+            "cookie": ""
+        }
+    }
+
+    # 保存配置文件
+    with open("tokens.json", "w", encoding="utf-8") as f:
+        json.dump(config, f, indent=2, ensure_ascii=False)
 
     print("\n所有账号 token 获取完成，已保存到 tokens.json。")
+    print(f"共获取 {len(rest_accounts)} 个账号的 token。")
 
 
 if __name__ == "__main__":
