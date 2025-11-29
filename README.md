@@ -28,7 +28,7 @@ ACCOUNTS = [
 
 ```
 {
-  "webhook_path": "/webhook/xxxxxxx",
+  "webhook_path": "/webhook/自己设定密钥",
   "port": 56578,
   "rest_accounts": [
   {
@@ -38,8 +38,8 @@ ACCOUNTS = [
   }
 ],
   "vertex": {
-    "base_url": "",
-    "cookie": ""
+    "base_url": "需要补齐",
+    "cookie": "需要补齐"
   }
 }
 
