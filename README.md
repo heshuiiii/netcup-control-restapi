@@ -59,7 +59,8 @@ ACCOUNTS = [
 
 ```docker compose up -d```
 
-```services:
+```
+services:
   netcupcontrol-restapi:
     image: netcup-control-restapi:latest
     container_name: netcupcontrol-restapi
@@ -68,4 +69,5 @@ ACCOUNTS = [
     volumes:
       - ./netcup-control-RESTAPI/config.json:/app/config.json
       - ./netcup-control-RESTAPI/dashboard.html:/app/dashboard.html
-    restart: unless-stopped```
+    restart: unless-stopped
+```
