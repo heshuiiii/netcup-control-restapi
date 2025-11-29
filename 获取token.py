@@ -7,21 +7,10 @@ TOKEN_URL = "https://www.servercontrolpanel.de/realms/scp/protocol/openid-connec
 
 # 这里放多个账号，每个账号只需要 client_id = "scp"
 ACCOUNTS = [
-
-    # {"name": "327210", "client_id": "scp"},
-    # {"name": "327445", "client_id": "scp"},
-    # {"name": "327559", "client_id": "scp"},
-    # {"name": "327490", "client_id": "scp"},
-    # {"name": "327512", "client_id": "scp"},
-    # {"name": "327622", "client_id": "scp"}
-    # {"name": "327883", "client_id": "scp"}
-
     {"name": "331022", "client_id": "scp"},
     {"name": "331058", "client_id": "scp"},
     {"name": "331033", "client_id": "scp"},
     {"name": "331169", "client_id": "scp"}
-
-
 ]
 
 
