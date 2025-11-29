@@ -101,10 +101,10 @@ def main():
     }
 
     # 保存配置文件
-    with open("tokens.json", "w", encoding="utf-8") as f:
+    with open("config.json", "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
-    print("\n所有账号 token 获取完成，已保存到 tokens.json。")
+    print("\n所有账号 token 获取完成，已保存到 config.json。")
     print(f"共获取 {len(rest_accounts)} 个账号的 token。")
 
 
