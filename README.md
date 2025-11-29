@@ -23,7 +23,7 @@ ACCOUNTS = [
 ]
 ```
 
-在本地或者任意服务器运行脚本  ```获取token-config.py```  
+在本地或者任意服务器运行脚本  ```获取token-config.py```    运行完毕后将  config.json配置补全
 
 
 ```
@@ -45,7 +45,19 @@ ACCOUNTS = [
 
 ```
 
+构建 ```docker build -t netcup-control-restapi .```
 
 
 
+```docker compose up -d```
 
+```services:
+  netcupcontrol-restapi:
+    image: netcup-control-restapi:latest
+    container_name: netcupcontrol-restapi
+    ports:
+      - "56578:56578"        # 如果你的 Flask 程序监听其它端口，把 56578 改掉
+    volumes:
+      - ./netcup-control-RESTAPI/config.json:/app/config.json
+      - ./netcup-control-RESTAPI/dashboard.html:/app/dashboard.html
+    restart: unless-stopped```
