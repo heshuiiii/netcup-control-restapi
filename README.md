@@ -49,19 +49,17 @@ ACCOUNTS = [
 
 ```
 {
-  "webhook_path": "/webhook/自己设定密钥",
-  "port": 56578,
-  "rest_accounts": [
-  {
-    "account_id": "327210",
-    "access_token": "",
-    "refresh_token": ""
-  }
-],
-  "vertex": {
-    "base_url": "需要补齐",
-    "cookie": "需要补齐"
-  }
+    "webhook_path": "/webhook/secret-密钥",
+    "port": 56578,
+    "rest_accounts": rest_accounts,
+    "vertex": {
+        "base_url": "https://vertex.example.com",
+        "cookie": "YOUR_VERTEX_COOKIE_HERE"
+    },
+    "telegram": {
+        "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+        "chat_id": "YOUR_TELEGRAM_CHAT_ID_HERE"
+    }
 }
 
 ```
