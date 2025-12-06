@@ -5,4 +5,6 @@ requests>=2.31.0
 flask>=3.0.0
 
 # qBittorrent API 客户端
+
 qbittorrent-api>=2024.1.0
+apscheduler
