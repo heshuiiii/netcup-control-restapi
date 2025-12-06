@@ -11,7 +11,20 @@
 
 ---
 
-## 首先首先
+
+# docker compose 已构建版本部署参考 
+```https://hub.docker.com/r/aksviolet/netcup-control-restapi```
+
+
+
+
+
+
+
+
+
+
+## 自行构建部署 首先首先
 ```git clone https://github.com/heshuiiii/netcup-control-restapi.git && cd netcup-control-restapi```
 
 
@@ -21,7 +34,7 @@
 先获取各token   **access_token** **refresh_token**  
 
 
-先修改```获取token-config.py```如果你有多个scp服务器需要使用请填写如下，显示出的网址点开后输入对应scp账户和密码脚本自动填写如config.json
+先修改```gen-token-config.py```如果你有多个scp服务器需要使用请填写如下，显示出的网址点开后输入对应scp账户和密码脚本自动填写如config.json
 ```
 ACCOUNTS = [
     {"name": "331022", "client_id": "scp"},
