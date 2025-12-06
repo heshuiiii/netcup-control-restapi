@@ -9,12 +9,15 @@ import os
 import json
 import threading
 import time
+import requests
 from datetime import datetime
 from flask import Flask, jsonify, request
 from logger import logger
 from netcup_api import NetcupAPI
 from qb_client import QBittorrentClient
 from qb_rss import QBRSSClient
+from telegram_notifier import TelegramNotifier
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 class NetcupTrafficMonitor:
@@ -44,6 +47,22 @@ class NetcupTrafficMonitor:
         if self.vertex_base_url:
             self.qb_rss = QBRSSClient(base=self.vertex_base_url, cookie=self.vertex_cookie)
 
+        # Telegram 配置
+        tg_config = config.get('telegram', {})
+        self.telegram_bot_token = tg_config.get('bot_token', '')
+        self.telegram_chat_id = tg_config.get('chat_id', '')
+        self.telegram_enabled = bool(self.telegram_bot_token and self.telegram_chat_id)
+        
+        self.telegram_notifier = None
+        if self.telegram_enabled:
+            self.telegram_notifier = TelegramNotifier(
+                bot_token=self.telegram_bot_token,
+                chat_id=self.telegram_chat_id
+            )
+            logger.info("[Telegram] 通知功能已启用")
+        else:
+            logger.warning("[Telegram] 通知功能未配置或已禁用")
+
         # 创建 Flask 应用
         self.app = Flask(__name__)
         self.setup_routes()
@@ -51,6 +70,22 @@ class NetcupTrafficMonitor:
         # 启动数据收集线程
         self.data_thread = threading.Thread(target=self.data_collection_loop, daemon=True)
         self.data_thread.start()
+
+        # 启动定时任务调度器 (用于 Telegram 通知)
+        if self.telegram_enabled and self.vertex_base_url:
+            self.scheduler = BackgroundScheduler(timezone='Asia/Shanghai')
+            # 每天的57分执行 Vertex 统计报告
+            self.scheduler.add_job(
+                func=self.send_vertex_daily_report,
+                trigger='cron',
+                minute=57,
+                id='vertex_daily_report'
+            )
+            self.scheduler.start()
+            logger.info("[调度器] Vertex 日报任务已启动 (每小时57分执行)")
+        else:
+            self.scheduler = None
+            logger.warning("[调度器] Telegram 或 Vertex 未配置,日报任务未启动")
 
         logger.info("=" * 60)
         logger.info("NetcupTrafficMonitor 初始化完成")
@@ -60,6 +95,7 @@ class NetcupTrafficMonitor:
         logger.info(f"加载了 {len(self.accounts)} 个账户")
         logger.info(f"Vertex: base_url={self.vertex_base_url}")
         logger.info(f"Vertex cookie configured: {bool(self.vertex_cookie)}")
+        logger.info(f"Telegram 通知: {'已启用' if self.telegram_enabled else '未启用'}")
         logger.info("=" * 60)
 
     def load_config(self):
@@ -77,6 +113,75 @@ class NetcupTrafficMonitor:
         except Exception as e:
             logger.error(f"加载配置文件时发生错误: {e}")
             return {}
+
+    def fetch_vertex_run_info(self) -> dict:
+        """
+        获取 Vertex 运行信息
+        
+        Returns:
+            dict: API 返回的数据,格式: {"success": bool, "data": {...}}
+        """
+        if not self.vertex_base_url or not self.vertex_cookie:
+            logger.error("[Vertex] 未配置 base_url 或 cookie,无法获取运行信息")
+            return {"success": False, "error": "配置缺失"}
+
+        try:
+            api_url = f"{self.vertex_base_url}/api/setting/getRunInfo"
+            headers = {
+                "Cookie": self.vertex_cookie,
+                "User-Agent": "Mozilla/5.0"
+            }
+            
+            logger.info(f"[Vertex] 正在请求运行信息: {api_url}")
+            response = requests.get(api_url, headers=headers, timeout=15)
+            response.raise_for_status()
+            
+            data = response.json()
+            logger.info(f"[Vertex] 成功获取运行信息")
+            return data
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"[Vertex] 请求运行信息失败: {e}")
+            return {"success": False, "error": str(e)}
+        except Exception as e:
+            logger.error(f"[Vertex] 获取运行信息时发生错误: {e}")
+            return {"success": False, "error": str(e)}
+
+    def send_vertex_daily_report(self):
+        """
+        发送 Vertex 每日运行报告到 Telegram
+        这个函数会被定时任务调用
+        """
+        logger.info("[定时任务] 开始生成 Vertex 日报")
+        
+        if not self.telegram_notifier:
+            logger.warning("[定时任务] Telegram 未配置,跳过日报发送")
+            return
+
+        try:
+            # 获取 Vertex 运行信息
+            run_info = self.fetch_vertex_run_info()
+            
+            if not run_info.get('success'):
+                error_msg = run_info.get('error', '未知错误')
+                logger.error(f"[定时任务] 获取 Vertex 信息失败: {error_msg}")
+                
+                # 发送错误通知
+                self.telegram_notifier.send_message(
+                    f"<b>❌ Vertex 日报生成失败</b>\n\n错误: {error_msg}"
+                )
+                return
+
+            # 发送报告
+            success = self.telegram_notifier.send_vertex_report(run_info)
+            
+            if success:
+                logger.info("[定时任务] Vertex 日报发送成功")
+            else:
+                logger.error("[定时任务] Vertex 日报发送失败")
+                
+        except Exception as e:
+            logger.error(f"[定时任务] 生成或发送 Vertex 日报时发生错误: {e}")
 
     def setup_routes(self):
         """设置Flask路由"""
@@ -121,12 +226,36 @@ class NetcupTrafficMonitor:
                 logger.error(f"获取状态时发生错误: {e}")
                 return jsonify({"success": False, "error": str(e)}), 500
 
+        @self.app.route('/api/vertex/report', methods=['GET'])
+        def vertex_report():
+            """手动触发 Vertex 报告发送"""
+            try:
+                if not self.telegram_notifier:
+                    return jsonify({"success": False, "error": "Telegram 未配置"}), 400
+
+                run_info = self.fetch_vertex_run_info()
+                
+                if not run_info.get('success'):
+                    return jsonify({"success": False, "error": "获取 Vertex 信息失败"}), 500
+
+                success = self.telegram_notifier.send_vertex_report(run_info)
+                
+                if success:
+                    return jsonify({"success": True, "message": "报告发送成功"})
+                else:
+                    return jsonify({"success": False, "error": "报告发送失败"}), 500
+
+            except Exception as e:
+                logger.error(f"手动触发 Vertex 报告时发生错误: {e}")
+                return jsonify({"success": False, "error": str(e)}), 500
+
         @self.app.route('/health', methods=['GET'])
         def health():
             return jsonify({
                 "status": "ok",
                 "timestamp": datetime.now().isoformat(),
-                "total_servers": len(self.cached_data)
+                "total_servers": len(self.cached_data),
+                "telegram_enabled": self.telegram_enabled
             })
 
         @self.app.route('/', methods=['GET'])
@@ -520,6 +649,7 @@ class NetcupTrafficMonitor:
         logger.info(f"启动Web服务,端口: {self.port}")
         logger.info(f"Webhook URL: http://localhost:{self.port}{self.webhook_path}")
         logger.info(f"监控面板: http://localhost:{self.port}/")
+        logger.info(f"手动触发 Vertex 报告: http://localhost:{self.port}/api/vertex/report")
         self.app.run(host='0.0.0.0', port=self.port, debug=False)
 
 
