@@ -1,15 +1,13 @@
 {
-  "webhook_path": "/webhook/xxxxxxxxx",
-  "port": 56578,
-  "rest_accounts": [
-  {
-    "account_id": "331169",
-    "access_token": "",
-    "refresh_token": ""
-  }
-],
-  "vertex": {
-    "base_url": "",
-    "cookie": ""
-  }
+    "webhook_path": "/webhook/secret-密钥",
+    "port": 56578,
+    "rest_accounts": rest_accounts,
+    "vertex": {
+        "base_url": "https://vertex.example.com",
+        "cookie": "YOUR_VERTEX_COOKIE_HERE"
+    },
+    "telegram": {
+        "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+        "chat_id": "YOUR_TELEGRAM_CHAT_ID_HERE"
+    }
 }
