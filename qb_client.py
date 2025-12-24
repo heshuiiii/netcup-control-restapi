@@ -80,8 +80,13 @@ class QBittorrentClient:
         """
         self.client.torrents.delete(hashes="all", delete_files=delete_files)
         logger.info("已发出删除全部任务的指令。")
-    
-    def delete_all_with_reannounce(self, *, delete_files: bool = False) -> None:
+
+    def resume_all(self):
+        """恢复所有暂停的种子"""
+        self.client.torrents.resume.all()
+        logger.info("已发出恢复所有种子的指令。")
+
+    def pause_and_delete_all(self, *, delete_files: bool = False) -> None:
         """
         先强制汇报，再暂停，最后删除所有任务。
         :param delete_files: True 时会连同本地数据一并删除（危险操作）
@@ -110,4 +115,4 @@ class QBittorrentClient:
 #    qb_client.is_alive()
 #    
 #    # 使用新方法：先汇报再暂停再删除
-#    qb_client.delete_all_with_reannounce(delete_files=False)
+#    qb_client.pause_and_delete_all(delete_files=False)
