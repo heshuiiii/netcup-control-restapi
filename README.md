@@ -11,6 +11,25 @@
 # docker compose 已构建版本部署参考 
 ```https://hub.docker.com/r/aksviolet/netcup-control-restapi```
 
+构建 ```docker build -t netcup-control-restapi .```
+
+
+
+```docker compose up -d```
+
+```
+services:
+  netcupcontrol-restapi:
+    image: netcup-control-restapi:latest
+    container_name: netcupcontrol-restapi
+    ports:
+      - "56578:56578"     
+    volumes:
+      - ./netcup-control-RESTAPI/config.json:/app/config.json
+      - ./netcup-control-RESTAPI/dashboard.html:/app/dashboard.html
+    restart: unless-stopped
+```
+
 
 ## 开始 
 
