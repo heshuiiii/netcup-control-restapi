@@ -1,32 +1,15 @@
 # Netcup Control REST API
 
 
-
-
-
-这是基于 Flask 的 Netcup 控制接口监控程序，使用 Docker Compose 部署。  
+这是基于 Flask 的 Netcup 控制接口监控程序，使用 Docker Compose 部署  或者python直接克隆运行。  
 **注意**：程序依赖两个配置文件，需要你自行编辑：
 - `config.json` （API 配置示例已提供）
 - `dashboard.html` （界面模板）
 
 ---
 
-
 # docker compose 已构建版本部署参考 
 ```https://hub.docker.com/r/aksviolet/netcup-control-restapi```
-
-
-
-
-
-
-
-
-
-
-## 自行构建部署 首先首先
-```git clone https://github.com/heshuiiii/netcup-control-restapi.git && cd netcup-control-restapi```
-
 
 
 ## 开始 
@@ -49,36 +32,26 @@ ACCOUNTS = [
 
 ```
 {
-    "webhook_path": "/webhook/secret-密钥",
-    "port": 56578,
-    "rest_accounts": rest_accounts,
-    "vertex": {
-        "base_url": "https://vertex.example.com",
-        "cookie": "YOUR_VERTEX_COOKIE_HERE"
-    },
-    "telegram": {
-        "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
-        "chat_id": "YOUR_TELEGRAM_CHAT_ID_HERE"
-    }
+  "webhook_path": "/webhook/密钥字符请修改",
+  "port": 56666,
+  "rest_accounts": [
+  {
+    "account_id": "327110",
+    "access_token": "",
+    "refresh_token": ""
+  }
+
+],
+  "vertex": {
+    "base_url": "https://vertex.example.com/api/v1",
+    "cookie": ""
+  },
+  "telegram": {
+    "bot_token": "你的bot_token请修改",
+    "chat_id": "你的chat_id请修改"
+  },
+  "throttle_action": {
+    "strategy": "pause_resume", #这里代表执行操作是 pause_resume pause delete   字面意思就是限速后暂停汇报 暂停汇报然后恢复后继续 直接删除
+    "delete_files": true  #仅delete时生效
+  }
 }
-
-```
-
-构建 ```docker build -t netcup-control-restapi .```
-
-
-
-```docker compose up -d```
-
-```
-services:
-  netcupcontrol-restapi:
-    image: netcup-control-restapi:latest
-    container_name: netcupcontrol-restapi
-    ports:
-      - "56578:56578"     
-    volumes:
-      - ./netcup-control-RESTAPI/config.json:/app/config.json
-      - ./netcup-control-RESTAPI/dashboard.html:/app/dashboard.html
-    restart: unless-stopped
-```
