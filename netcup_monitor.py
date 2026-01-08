@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 增强版 Netcup 流量监控控制器 - 修复版
-添加了限速历史追踪和 Telegram 通知功能
+添加了限速后历史追踪和 Telegram 通知功能
+支持自定义限速后的处理策略
 """
 
 import os
@@ -38,6 +39,15 @@ class NetcupTrafficMonitor:
         self.webhook_path = config.get('webhook_path', '/webhook/secret-monitor')
         self.port = config.get('port', 56578)
         self.accounts = config.get('rest_accounts', [])
+
+        # 限速处理策略配置
+        throttle_config = config.get('throttle_action', {})
+        self.throttle_strategy = throttle_config.get('strategy', 'pause')  # pause, delete, pause_resume
+        self.delete_files = throttle_config.get('delete_files', False)  # 删除时是否删除文件
+        
+        logger.info(f"[配置] 限速处理策略: {self.throttle_strategy}")
+        if self.throttle_strategy == 'delete':
+            logger.info(f"[配置] 删除文件: {self.delete_files}")
 
         # Vertex 配置
         vconf = config.get('vertex', {})
@@ -155,6 +165,12 @@ class NetcupTrafficMonitor:
         if old_throttled != is_throttled:
             logger.warning(f"[历史记录] {ip} 状态变化: {old_throttled} -> {is_throttled}")
             
+            strategy_name = {
+                'pause': '暂停种子',
+                'delete': '删除种子' + ('(含文件)' if self.delete_files else '(保留文件)'),
+                'pause_resume': '暂停后恢复'
+            }.get(self.throttle_strategy, '未知策略')
+            
             if is_throttled:
                 # 被限速
                 history["last_throttle_time"] = timestamp
@@ -174,7 +190,7 @@ class NetcupTrafficMonitor:
                             f"🔴 <b>限速警告</b>\n\n"
                             f"服务器: <code>{server_name or ip}</code>\n"
                             f"IP: <code>{ip}</code>\n\n"
-                            f"已被限速,下载器已暂停\n"
+                            f"已被限速,执行策略: <b>{strategy_name}</b>\n"
                             f"限速次数: 第 {history['throttle_count']} 次\n"
                             f"时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"
                         )
@@ -210,7 +226,7 @@ class NetcupTrafficMonitor:
                                 f"🟢 <b>限速解除</b>\n\n"
                                 f"服务器: <code>{server_name or ip}</code>\n"
                                 f"IP: <code>{ip}</code>\n\n"
-                                f"限速已解除,下载器已启用\n"
+                                f"限速已解除,执行策略: <b>{strategy_name}</b>\n"
                                 f"本次限速时长: <code>{duration_str}</code>\n"
                                 f"累计限速: <code>{self.format_duration(history['total_throttled_seconds'])}</code>\n"
                                 f"时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -262,7 +278,7 @@ class NetcupTrafficMonitor:
         if history.get("current_throttled") and history.get("last_throttle_time"):
             current_throttle_duration = int(now - history["last_throttle_time"])
         
-        # 计算总限速时间（不包括当前正在进行的限速）
+        # 计算总限速时间(不包括当前正在进行的限速)
         total_throttled = history.get("total_throttled_seconds", 0)
         
         # 格式化时长为小时
@@ -324,6 +340,7 @@ class NetcupTrafficMonitor:
                         "total_servers": len(servers),
                         "throttled_count": sum(1 for s in servers if s.get('trafficThrottled')),
                         "normal_count": sum(1 for s in servers if not s.get('trafficThrottled')),
+                        "throttle_strategy": self.throttle_strategy,
                         "servers": servers
                     }
                 })
@@ -380,15 +397,14 @@ class NetcupTrafficMonitor:
                 "status": "ok",
                 "timestamp": datetime.now().isoformat(),
                 "total_servers": len(self.cached_data),
-                "telegram_enabled": self.telegram_enabled
+                "telegram_enabled": self.telegram_enabled,
+                "throttle_strategy": self.throttle_strategy
             })
 
         @self.app.route('/', methods=['GET'])
         def dashboard():
             """Web监控面板"""
             return self.render_dashboard()
-
-
 
     def render_dashboard(self):
         """渲染 Web 监控面板"""
@@ -489,7 +505,7 @@ class NetcupTrafficMonitor:
         return server_data
 
     def enable_downloader(self, ip: str):
-        """启用下载器并恢复种子状态"""
+        """启用下载器并根据策略恢复种子状态"""
         # 1. 启用 Vertex 下载器
         if self.qb_rss:
             try:
@@ -498,25 +514,39 @@ class NetcupTrafficMonitor:
             except Exception as e:
                 logger.error(f"[Vertex] 启用下载器({ip})失败: {e}")
 
-        # 2. 恢复 qBittorrent 中的种子
-        if self.qb_rss:
-            try:
-                url, username, password = self.qb_rss.get_user_info(ip)
-                if url and username and password:
-                    qb = QBittorrentClient(url, username, password)
-                    # 直接恢复所有暂停的种子
-                    qb.client.torrents.resume.all()
-                    logger.info(f"[qBittorrent] 已恢复 {ip} 的所有种子下载")
-                else:
-                    logger.warning(f"[qBittorrent] 无法获取 {ip} 的连接信息")
-            except Exception as e:
-                logger.error(f"[qBittorrent] 恢复 {ip} 种子失败: {e}")
-
-
-
+        # 2. 根据策略处理 qBittorrent 中的种子
+        if self.throttle_strategy == 'pause_resume':
+            # pause_resume 策略: 恢复所有暂停的种子
+            if self.qb_rss:
+                try:
+                    url, username, password = self.qb_rss.get_user_info(ip)
+                    if url and username and password:
+                        qb = QBittorrentClient(url, username, password)
+                        qb.resume_all()
+                        logger.info(f"[qBittorrent] 已恢复 {ip} 的所有种子下载 (pause_resume策略)")
+                    else:
+                        logger.warning(f"[qBittorrent] 无法获取 {ip} 的连接信息")
+                except Exception as e:
+                    logger.error(f"[qBittorrent] 恢复 {ip} 种子失败: {e}")
+        elif self.throttle_strategy == 'pause':
+            # pause 策略: 也恢复种子(因为之前只是暂停)
+            if self.qb_rss:
+                try:
+                    url, username, password = self.qb_rss.get_user_info(ip)
+                    if url and username and password:
+                        qb = QBittorrentClient(url, username, password)
+                        qb.resume_all()
+                        logger.info(f"[qBittorrent] 已恢复 {ip} 的所有种子下载 (pause策略)")
+                    else:
+                        logger.warning(f"[qBittorrent] 无法获取 {ip} 的连接信息")
+                except Exception as e:
+                    logger.error(f"[qBittorrent] 恢复 {ip} 种子失败: {e}")
+        elif self.throttle_strategy == 'delete':
+            # delete 策略: 不需要恢复(种子已被删除)
+            logger.info(f"[qBittorrent] {ip} 使用delete策略,无需恢复种子")
 
     def disable_downloader(self, ip: str, url: str = None, username: str = None, password: str = None):
-        """禁用下载器并暂停种子（不删除）"""
+        """禁用下载器并根据策略处理种子"""
         # 1. 禁用 Vertex 下载器
         if self.qb_rss:
             try:
@@ -525,29 +555,44 @@ class NetcupTrafficMonitor:
             except Exception as e:
                 logger.error(f"[Vertex] 暂停下载器({ip})失败: {e}")
 
-        # 2. 暂停 qBittorrent 中的种子（不删除文件）
-        if url and username and password:
-            try:
-                qb = QBittorrentClient(url, username, password)
-                # 使用汇报+暂停的方法（不删除任何文件）
-                qb.pause_all_with_reannounce()
-                logger.info(f"[qBittorrent] 已暂停 {ip} 的所有种子（保留文件）")
-            except Exception as e:
-                logger.error(f"[qBittorrent] 暂停 {ip} 种子失败: {e}")
-
-        elif self.qb_rss:
-            # 如果没有直接传入连接信息，尝试从 Vertex 获取
+        # 2. 获取 qBittorrent 连接信息
+        if not (url and username and password) and self.qb_rss:
             try:
                 url, username, password = self.qb_rss.get_user_info(ip)
-                if url and username and password:
-                    qb = QBittorrentClient(url, username, password)
-                    qb.pause_all_with_reannounce()
-                    logger.info(f"[qBittorrent] 已暂停 {ip} 的所有种子（保留文件）")
-                else:
-                    logger.warning(f"[qBittorrent] 无法获取 {ip} 的连接信息，跳过种子暂停")
             except Exception as e:
-                logger.error(f"[qBittorrent] 暂停 {ip} 种子失败: {e}")
+                logger.error(f"[qBittorrent] 获取 {ip} 连接信息失败: {e}")
+                return
 
+        if not (url and username and password):
+            logger.warning(f"[qBittorrent] 无法获取 {ip} 的连接信息,跳过种子处理")
+            return
+
+        # 3. 根据策略处理种子
+        try:
+            qb = QBittorrentClient(url, username, password)
+            
+            if self.throttle_strategy == 'pause':
+                # 策略1: 汇报后暂停(不删除)
+                qb.pause_all_with_reannounce()
+                logger.info(f"[qBittorrent] 已暂停 {ip} 的所有种子(保留文件) - pause策略")
+                
+            elif self.throttle_strategy == 'delete':
+                # 策略2: 汇报后删除
+                qb.pause_and_delete_all(delete_files=self.delete_files)
+                action = "删除种子和文件" if self.delete_files else "删除种子(保留文件)"
+                logger.info(f"[qBittorrent] 已{action} {ip} - delete策略")
+                
+            elif self.throttle_strategy == 'pause_resume':
+                # 策略3: 汇报后暂停(解除限速后恢复)
+                qb.pause_all_with_reannounce()
+                logger.info(f"[qBittorrent] 已暂停 {ip} 的所有种子(稍后恢复) - pause_resume策略")
+                
+            else:
+                logger.warning(f"[qBittorrent] 未知策略: {self.throttle_strategy},默认执行暂停")
+                qb.pause_all_with_reannounce()
+                
+        except Exception as e:
+            logger.error(f"[qBittorrent] 处理 {ip} 种子失败: {e}")
 
     def update_cached_data(self):
         """更新缓存的数据"""

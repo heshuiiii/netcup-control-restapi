@@ -1,26 +1,31 @@
 # Netcup Control REST API
 
 
+
+
+
 这是基于 Flask 的 Netcup 控制接口监控程序，使用 Docker Compose 部署。  
 **注意**：程序依赖两个配置文件，需要你自行编辑：
 - `config.json` （API 配置示例已提供）
 - `dashboard.html` （界面模板）
 
 ---
-## 自行构建部署 首先首先
-```git clone https://github.com/heshuiiii/netcup-control-restapi.git && cd netcup-control-restapi```
 
 
-## docker compose 已构建版本部署参考 
+# docker compose 已构建版本部署参考 
 ```https://hub.docker.com/r/aksviolet/netcup-control-restapi```
 
-### 暂停种子版本 限速后只暂停种子 设定好vt的分类删种或者保留  恢复限速后会继续下载上传种子    
-**aksviolet/netcup-control-restapi:pauseresume**
 
 
 
-## Vertex定时报送tracker数据 **http://ip:port/api/vertex/report**   访问会立即生成报告发送到telegram 
 
+
+
+
+
+
+## 自行构建部署 首先首先
+```git clone https://github.com/heshuiiii/netcup-control-restapi.git && cd netcup-control-restapi```
 
 
 
@@ -68,7 +73,7 @@ ACCOUNTS = [
 ```
 services:
   netcupcontrol-restapi:
-    image: netcup-control-restapi:pauseresume
+    image: netcup-control-restapi:latest
     container_name: netcupcontrol-restapi
     ports:
       - "56578:56578"     

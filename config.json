@@ -1,13 +1,24 @@
 {
-    "webhook_path": "/webhook/secret-密钥",
-    "port": 56578,
-    "rest_accounts": rest_accounts,
-    "vertex": {
-        "base_url": "https://vertex.example.com",
-        "cookie": "YOUR_VERTEX_COOKIE_HERE"
-    },
-    "telegram": {
-        "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
-        "chat_id": "YOUR_TELEGRAM_CHAT_ID_HERE"
-    }
+  "webhook_path": "/webhook/密钥字符请修改",
+  "port": 56666,
+  "rest_accounts": [
+  {
+    "account_id": "327110",
+    "access_token": "",
+    "refresh_token": ""
+  }
+
+],
+  "vertex": {
+    "base_url": "https://vertex.example.com/api/v1",
+    "cookie": ""
+  },
+  "telegram": {
+    "bot_token": "你的bot_token请修改",
+    "chat_id": "你的chat_id请修改"
+  },
+  "throttle_action": {
+    "strategy": "pause_resume",     
+    "delete_files": true     
+  }
 }

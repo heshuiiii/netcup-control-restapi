@@ -144,7 +144,6 @@
             box-shadow: 0 5px 20px rgba(56, 239, 125, 0.3);
         }
 
-        /* 卡片视图 */
         .servers-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
@@ -181,242 +180,10 @@
             background: linear-gradient(to bottom, #fff 0%, #fff5f7 100%);
         }
 
-        /* 列表视图 */
-        .servers-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .server-list-item {
-            background: white;
-            border-radius: 15px;
-            padding: 25px 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border-left: 5px solid #667eea;
-            display: grid;
-            grid-template-columns: 250px 1fr auto;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .server-list-item:hover {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            transform: translateX(5px);
-        }
-
-        .server-list-item.throttled {
-            border-left-color: #f5576c;
-            background: linear-gradient(to right, #fff5f7 0%, #fff 100%);
-        }
-
-        .list-server-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .list-server-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .list-server-ip {
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .list-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .list-stat {
-            text-align: center;
-        }
-
-        .list-stat-label {
-            font-size: 11px;
-            color: #6b7280;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .list-stat-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .list-status-badge {
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            text-align: center;
-            min-width: 100px;
-        }
-
-        .list-status-badge.throttled {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-
-        .list-status-badge.normal {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-        }
-
-        /* 紧凑视图 */
-        .servers-compact {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 15px;
-        }
-
-        .server-compact-item {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border-left: 4px solid #667eea;
-        }
-
-        .server-compact-item:hover {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-            transform: translateY(-3px);
-        }
-
-        .server-compact-item.throttled {
-            border-left-color: #f5576c;
-        }
-
-        .compact-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .compact-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .compact-badge {
-            padding: 5px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            color: white;
-        }
-
-        .compact-badge.throttled {
-            background: #f5576c;
-        }
-
-        .compact-badge.normal {
-            background: #38ef7d;
-        }
-
-        .compact-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            font-size: 13px;
-        }
-
-        .compact-stat {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            background: #f9fafb;
-            border-radius: 6px;
-        }
-
-        .compact-stat-label {
-            color: #6b7280;
-            font-weight: 600;
-        }
-
-        .compact-stat-value {
-            font-weight: 700;
-            color: #333;
-        }
-
-        /* 表格视图 */
-        .servers-table-container {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-        }
-
-        .servers-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .servers-table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .servers-table th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .servers-table td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-        }
-
-        .servers-table tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        .servers-table tbody tr:hover {
-            background: #f9fafb;
-        }
-
-        .servers-table tbody tr.throttled {
-            background: #fff5f7;
-        }
-
-        .table-status {
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            color: white;
-            display: inline-block;
-        }
-
-        .table-status.throttled {
-            background: #f5576c;
-        }
-
-        .table-status.normal {
-            background: #38ef7d;
-        }
-
         .server-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 3px solid #f0f0f0;
@@ -428,7 +195,7 @@
             color: #333;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
 
         .server-title .name {
@@ -439,6 +206,17 @@
             font-size: 14px;
             color: #6b7280;
             font-weight: 500;
+        }
+
+        .server-title .account {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+            background: #f0f4ff;
+            padding: 4px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            width: fit-content;
         }
 
         .badge {
@@ -552,6 +330,273 @@
             font-size: 20px;
             font-weight: 800;
             color: #111827;
+        }
+
+        .servers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .server-list-item {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+            display: grid;
+            grid-template-columns: 280px 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .server-list-item:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateX(5px);
+        }
+
+        .server-list-item.throttled {
+            border-left-color: #f5576c;
+            background: linear-gradient(to right, #fff5f7 0%, #fff 100%);
+        }
+
+        .list-server-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .list-server-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .list-server-ip {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .list-server-account {
+            font-size: 11px;
+            color: #667eea;
+            font-weight: 600;
+            background: #f0f4ff;
+            padding: 3px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .list-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .list-stat {
+            text-align: center;
+        }
+
+        .list-stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .list-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .list-status-badge {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .list-status-badge.throttled {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .list-status-badge.normal {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .servers-compact {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+        }
+
+        .server-compact-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .server-compact-item:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .server-compact-item.throttled {
+            border-left-color: #f5576c;
+        }
+
+        .compact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .compact-title-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .compact-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .compact-account {
+            font-size: 10px;
+            color: #667eea;
+            font-weight: 600;
+            background: #f0f4ff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .compact-badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .compact-badge.throttled {
+            background: #f5576c;
+        }
+
+        .compact-badge.normal {
+            background: #38ef7d;
+        }
+
+        .compact-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .compact-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .compact-stat-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .compact-stat-value {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .servers-table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .servers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .servers-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .servers-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .servers-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .servers-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .servers-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .servers-table tbody tr.throttled {
+            background: #fff5f7;
+        }
+
+        .table-status {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            display: inline-block;
+        }
+
+        .table-status.throttled {
+            background: #f5576c;
+        }
+
+        .table-status.normal {
+            background: #38ef7d;
+        }
+
+        .table-account-badge {
+            font-size: 11px;
+            color: #667eea;
+            font-weight: 600;
+            background: #f0f4ff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
         }
 
         .loading {
@@ -699,20 +744,10 @@
                 return `${(tib * 1024).toFixed(2)} GiB`;
             }
         }
-        
-        function maskIP(ip) {
-            // 将IP的C段和D段替换为x，例如：159.195.58.147 -> 159.195.x.x
-            const parts = ip.split('.');
-            if (parts.length === 4) {
-                return `${parts[0]}.${parts[1]}.x.x`;
-            }
-            return ip;
-        }
 
         function switchView(view) {
             currentView = view;
             
-            // 更新按钮状态
             document.querySelectorAll('.view-switcher')[0].querySelectorAll('.view-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -724,7 +759,6 @@
         function sortServers(sortType) {
             currentSort = sortType;
             
-            // 更新按钮状态
             document.querySelectorAll('.view-switcher')[1].querySelectorAll('.view-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -732,7 +766,6 @@
             
             if (!currentData || !currentData.servers) return;
             
-            // 复制服务器数组进行排序
             sortedServers = [...currentData.servers];
             
             switch(sortType) {
@@ -750,14 +783,12 @@
                     break;
                 case 'status':
                     sortedServers.sort((a, b) => {
-                        // 限速中的排在前面
                         if (a.trafficThrottled && !b.trafficThrottled) return -1;
                         if (!a.trafficThrottled && b.trafficThrottled) return 1;
                         return 0;
                     });
                     break;
                 default:
-                    // 默认排序，保持原顺序
                     break;
             }
             
@@ -767,19 +798,16 @@
         function updateView() {
             if (!currentData) return;
             
-            // 如果还没有排序过，使用原始数据
             if (sortedServers.length === 0) {
                 sortedServers = [...currentData.servers];
             }
 
-            // 计算整体可用率
             const totalServers = currentData.total_servers;
             const normalCount = currentData.normal_count;
             const availabilityRate = totalServers > 0 
                 ? ((normalCount / totalServers) * 100).toFixed(2) 
                 : 100;
 
-            // 更新统计卡片
             document.getElementById('stats').innerHTML = `
                 <div class="stat-card">
                     <h3>📊 总服务器</h3>
@@ -800,7 +828,6 @@
                 </div>
             `;
 
-            // 根据当前视图渲染服务器列表
             const serversContainer = document.getElementById('servers');
             
             if (currentView === 'card') {
@@ -830,6 +857,7 @@
                         <div class="server-title">
                             <div class="name">${s.server_name}</div>
                             <div class="ip">${s.ipv4IP}</div>
+                            <div class="account">📋 ${s.account_id}</div>
                         </div>
                         <span class="badge ${isThrottled ? 'throttled' : 'normal'}">
                             ${isThrottled ? '🔴 限速中' : '🟢 正常'}
@@ -894,6 +922,7 @@
                     <div class="list-server-info">
                         <div class="list-server-name">${s.server_name}</div>
                         <div class="list-server-ip">📍 ${s.ipv4IP}</div>
+                        <div class="list-server-account">📋 ${s.account_id}</div>
                     </div>
                     
                     <div class="list-stats-grid">
@@ -929,7 +958,10 @@
                 return `
                 <div class="server-compact-item ${isThrottled ? 'throttled' : ''}">
                     <div class="compact-header">
-                        <div class="compact-title">${s.server_name}</div>
+                        <div class="compact-title-wrapper">
+                            <div class="compact-title">${s.server_name}</div>
+                            <div class="compact-account">📋 ${s.account_id}</div>
+                        </div>
                         <span class="compact-badge ${isThrottled ? 'throttled' : 'normal'}">
                             ${isThrottled ? '限速' : '正常'}
                         </span>
@@ -963,7 +995,11 @@
                 
                 return `
                 <tr class="${isThrottled ? 'throttled' : ''}">
-                    <td><strong>${s.server_name}</strong><br><small style="color: #6b7280;">${s.ipv4IP}</small></td>
+                    <td>
+                        <strong>${s.server_name}</strong><br>
+                        <small style="color: #6b7280;">${s.ipv4IP}</small><br>
+                        <span class="table-account-badge">📋 ${s.account_id}</span>
+                    </td>
                     <td><span class="table-status ${isThrottled ? 'throttled' : 'normal'}">${isThrottled ? '🔴 限速中' : '🟢 正常'}</span></td>
                     <td>${formatTraffic(s.traffic_tib)}</td>
                     <td>${formatTraffic(s.tx_tib)}</td>
@@ -999,10 +1035,7 @@
             `;
         }
 
-        // 初始加载
         fetchData();
-        
-        // 定时刷新
         setInterval(fetchData, REFRESH_INTERVAL);
     </script>
 </body>
